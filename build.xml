@@ -1,0 +1,60 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="psy-lob-saw" default="go">
+	<property name="ivy.install.version" value="2.0.0-beta1" />
+	<property name="ivy.jar.dir" value="${basedir}/ivy" />
+	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+	<property name="build.dir" value="build" />
+	<property name="src.dir" value="src" />
+	<target name="download-ivy" unless="skip.download">
+		<mkdir dir="${ivy.jar.dir}" />
+		<!-- 
+		download Ivy from web site so that it can be used even without any special installation
+		-->
+		<echo message="installing ivy..." />
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+	</target>
+	<!--
+	this target is not necessary if you put ivy.jar in your ant lib directory if you already have ivy in your ant lib, you can simply remove this target and the dependency the 'go' target has on it =================================
+	-->
+	<target name="install-ivy" depends="download-ivy" description="--> install ivy">
+		<!--
+		try to load ivy here from local ivy dir, in case the user has not already dropped it into ant's lib dir (note that the latter copy will always take precedence). We will not fail as long as local lib dir exists (it may be empty) and ivy is in at least one of ant's lib dir or the local lib dir.
+		-->
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+	<!--
+================================= target: go Go ivy, go! =================================
+-->
+	<target name="go" depends="install-ivy" description="--> resolve dependencies, compile and run the project">
+		<ivy:cachepath organisation="commons-lang" module="commons-lang" revision="2.1" pathid="lib.path.id" inline="true" />
+		<echo message="compiling..." />
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
+		<echo>
+We are now ready to execute our simple program with its dependency on commons-lang. Let's go!
+</echo>
+		<java classname="example.Hello">
+			<classpath>
+				<path refid="lib.path.id" />
+				<path location="${build.dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="clean" description="--> clean the project">
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${src.dir}" />
+			<fileset dir="${build.dir}" />
+		</delete>
+	</target>
+
+	<target name="clean-ivy" description="--> clean the ivy installation">
+		<delete dir="${ivy.jar.dir}" />
+	</target>
+
+	<target name="clean-cache" depends="install-ivy" description="--> clean the ivy cache">
+		<ivy:cleancache />
+	</target>
+</project>
