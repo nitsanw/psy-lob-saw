@@ -4,6 +4,8 @@ import static java.lang.System.out;
 
 import java.util.concurrent.CountDownLatch;
 
+import util.Sequence;
+
 public final class SequenceOrderedPingPong
 {
     private static final long ITERATIONS = 100L * 1000L * 1000L;

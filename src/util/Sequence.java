@@ -1,6 +1,5 @@
-package pingpong;
+package util;
 
-import util.UnsafeAccess;
 
 public final class Sequence {
     private static final long valueOffset;
@@ -26,6 +25,12 @@ public final class Sequence {
 
     public long get() {
 	return UnsafeAccess.unsafe.getLongVolatile(paddedValue, valueOffset);
+    }
+    public long getLocal() {
+	return UnsafeAccess.unsafe.getLong(paddedValue, valueOffset);
+    }
+    public void setLocal(final long value) {
+	UnsafeAccess.unsafe.putLong(paddedValue, valueOffset, value);
     }
 
     public void setOrdered(final long value) {
