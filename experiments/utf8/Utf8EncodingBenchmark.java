@@ -5,6 +5,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 
 import com.google.caliper.Param;
@@ -56,6 +60,26 @@ public class Utf8EncodingBenchmark extends SimpleBenchmark {
 	for (int i = 0; i < reps; i++) {
 	    for (int stringIndex = 0; stringIndex < strings.size(); stringIndex++) {
 		dest.put(strings.get(stringIndex).getBytes("UTF-8"));
+		countBytes += dest.position();
+		dest.clear();
+	    }
+	}
+	return countBytes;
+    }
+
+    public int timeCharsetEncoder(int reps) throws UnsupportedEncodingException {
+	int countBytes = 0;
+	char[] chars = new char[4096];
+	CharBuffer charBuffer = CharBuffer.wrap(chars);
+	CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+	for (int i = 0; i < reps; i++) {
+	    for (int stringIndex = 0; stringIndex < strings.size(); stringIndex++) {
+		String source = strings.get(stringIndex);
+		source.getChars(0, source.length(), chars, 0);
+		charBuffer.clear();
+		encoder.reset();
+		charBuffer.limit(source.length());
+		encoder.encode(charBuffer, dest, true);
 		countBytes += dest.position();
 		dest.clear();
 	    }
