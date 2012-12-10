@@ -1,7 +1,7 @@
 package util;
 
 
-public final class Sequence {
+public final class PaddedLong {
     private static final long valueOffset;
 
     static {
@@ -16,20 +16,17 @@ public final class Sequence {
 
     private final long[] paddedValue = new long[15];
 
-    public Sequence() {
+    public PaddedLong() {
     }
 
-    public Sequence(final long initialValue) {
+    public PaddedLong(final long initialValue) {
 	setOrdered(initialValue);
     }
 
     public long get() {
-	return UnsafeAccess.unsafe.getLongVolatile(paddedValue, valueOffset);
-    }
-    public long getLocal() {
 	return UnsafeAccess.unsafe.getLong(paddedValue, valueOffset);
     }
-    public void setLocal(final long value) {
+    public void set(final long value) {
 	UnsafeAccess.unsafe.putLong(paddedValue, valueOffset, value);
     }
 
@@ -37,13 +34,11 @@ public final class Sequence {
 	UnsafeAccess.unsafe.putOrderedLong(paddedValue, valueOffset, value);
     }
 
-    public void addOrdered(final long delta) {
-	UnsafeAccess.unsafe.putOrderedLong(paddedValue, valueOffset, get()
-		+ delta);
-    }
-
     public void setVolatile(final long value) {
 	UnsafeAccess.unsafe.putLongVolatile(paddedValue, valueOffset, value);
+    }
+    public long getVolatile() {
+	return UnsafeAccess.unsafe.getLongVolatile(paddedValue, valueOffset);
     }
 
     public boolean compareAndSet(final long expectedValue, final long newValue) {
@@ -51,35 +46,7 @@ public final class Sequence {
 		expectedValue, newValue);
     }
 
-    public long incrementAndGet() {
-	return addAndGet(1L);
-    }
-
-    public long getAndIncrement() {
-	return getAndAdd(1L);
-    }
-
-    public long getAndAdd(final long increment) {
-	long expectedVal;
-	long newVal;
-	do {
-	    expectedVal = get();
-	    newVal = expectedVal + increment;
-	} while (!compareAndSet(expectedVal, newVal));
-	return expectedVal;
-    }
-
-    public long addAndGet(final long increment) {
-	long expectedVal;
-	long newVal;
-	do {
-	    expectedVal = get();
-	    newVal = expectedVal + increment;
-	} while (!compareAndSet(expectedVal, newVal));
-	return expectedVal;
-    }
-
     public String toString() {
-	return Long.toString(get());
+	return Long.toString(getVolatile());
     }
 }
