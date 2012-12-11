@@ -3,11 +3,9 @@ package util;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import pingpong.PingPongCounter;
-
-
-public final class DirectLong implements PingPongCounter{
-    private final ByteBuffer buffy = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder());
+public final class DirectLong {
+    private final ByteBuffer buffy = ByteBuffer.allocateDirect(8).order(
+	    ByteOrder.nativeOrder());
     private final long address = UnsafeDirectByteBuffer.getAddress(buffy);
 
     public DirectLong() {

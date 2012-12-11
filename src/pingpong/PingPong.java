@@ -4,6 +4,11 @@ import static java.lang.System.out;
 
 import java.util.concurrent.CountDownLatch;
 
+import util.Counter;
+import util.Counters;
+import util.DirectLong;
+import util.DirectPaddedLong;
+
 public final class PingPong {
     private static final long WARMUP_ITERATIONS = 100L * 1000L;
     private static final long ITERATIONS = 10L * 1000L * 1000L;
@@ -11,7 +16,7 @@ public final class PingPong {
 
     private static volatile CountDownLatch latch = new CountDownLatch(2);
 
-    public PingPong(PingPongCounter pingValue, PingPongCounter pongValue)
+    public PingPong(Counter pingValue, Counter pongValue)
 	    throws Exception {
 	Thread pongThread = new Thread(new PongRunner(pingValue, pongValue, WARMUP_ITERATIONS));
 	Thread pingThread = new Thread(new PingRunner(pingValue, pongValue, WARMUP_ITERATIONS));
@@ -37,10 +42,10 @@ public final class PingPong {
     }
 
     public static final class PingRunner implements Runnable {
-	private final PingPongCounter pingValue;
-	private final PingPongCounter pongValue;
+	private final Counter pingValue;
+	private final Counter pongValue;
 	private final long iterations;
-	public PingRunner(PingPongCounter pingValue, PingPongCounter pongValue, long iterations) {
+	public PingRunner(Counter pingValue, Counter pongValue, long iterations) {
 	    super();
 	    this.pingValue = pingValue;
 	    this.pongValue = pongValue;
@@ -58,10 +63,10 @@ public final class PingPong {
     }
 
     public static final class PongRunner implements Runnable {
-	private final PingPongCounter pingValue;
-	private final PingPongCounter pongValue;
+	private final Counter pingValue;
+	private final Counter pongValue;
 	private final long iterations;
-	public PongRunner(PingPongCounter pingValue, PingPongCounter pongValue, long iterations) {
+	public PongRunner(Counter pingValue, Counter pongValue, long iterations) {
 	    super();
 	    this.pingValue = pingValue;
 	    this.pongValue = pongValue;
@@ -76,5 +81,9 @@ public final class PingPong {
 		pongValue.set(l);
 	    }
 	}
+    }
+    public static void main(final String[] args) throws Exception {
+	    System.out.print(args[0]+",\t"+args[1]+",\t");
+	    new PingPong(Counters.createCounter(args), Counters.createCounter(args));
     }
 }
