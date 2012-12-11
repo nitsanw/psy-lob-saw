@@ -1,4 +1,4 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="psy-lob-saw" default="go">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="psy-lob-saw" default="build">
 	<property name="ivy.install.version" value="2.0.0-beta1" />
 	<property name="ivy.jar.dir" value="${basedir}/ivy" />
 	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
@@ -24,23 +24,12 @@
 		</path>
 		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
 	</target>
-	<!--
-================================= target: go Go ivy, go! =================================
--->
-	<target name="go" depends="install-ivy" description="--> resolve dependencies, compile and run the project">
+
+	<target name="build" depends="install-ivy" description=" resolve dependencies, compile and run the project">
 		<ivy:cachepath organisation="commons-lang" module="commons-lang" revision="2.1" pathid="lib.path.id" inline="true" />
 		<echo message="compiling..." />
 		<mkdir dir="${build.dir}" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
-		<echo>
-We are now ready to execute our simple program with its dependency on commons-lang. Let's go!
-</echo>
-		<java classname="example.Hello">
-			<classpath>
-				<path refid="lib.path.id" />
-				<path location="${build.dir}" />
-			</classpath>
-		</java>
 	</target>
 
 	<target name="clean" description="--> clean the project">
