@@ -43,7 +43,7 @@ public abstract class Counters {
 
 	@Override
 	public void set(long l) {
-	    val.setOrdered(l);
+	    val.setVolatile(l);
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public abstract class Counters {
 
 	@Override
 	public void set(long l) {
-	    val.setOrdered(l);
+	    val.setVolatile(l);
 	}
 
 	@Override
