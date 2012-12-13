@@ -2,7 +2,10 @@ package pingpong;
 
 import static java.lang.System.out;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+
+import catchup.Catchup;
 
 import util.Counter;
 import util.Counters;
@@ -14,34 +17,39 @@ public final class PingPong {
     private static final long ITERATIONS = 10L * 1000L * 1000L;
 
 
-    private static volatile CountDownLatch latch = new CountDownLatch(2);
+    private volatile CountDownLatch latch = new CountDownLatch(2);
+    private final Counter pingValue;
+    private final Counter pongValue;
+    public PingPong(Counter pingValue, Counter pongValue) {
+	super();
+	this.pingValue = pingValue;
+	this.pongValue = pongValue;
+    }
 
-    public PingPong(Counter pingValue, Counter pongValue)
-	    throws Exception {
-	Thread pongThread = new Thread(new PongRunner(pingValue, pongValue, WARMUP_ITERATIONS));
-	Thread pingThread = new Thread(new PingRunner(pingValue, pongValue, WARMUP_ITERATIONS));
-	pongThread.start();
-	pingThread.start();
-	latch.await();
-	pongThread.join();
+    public long runOnce() throws InterruptedException{
 	pingValue.set(-1L);
 	pongValue.set(-1L);
 	latch = new CountDownLatch(2);
-	pongThread = new Thread(new PongRunner(pingValue, pongValue, ITERATIONS));
-	pingThread = new Thread(new PingRunner(pingValue, pongValue, ITERATIONS));
+	Thread pongThread = new Thread(new PongRunner(pingValue, pongValue, ITERATIONS));
+	Thread pingThread = new Thread(new PingRunner(pingValue, pongValue, ITERATIONS));
 	pongThread.start();
 	pingThread.start();
 	latch.await();
 	long start = System.nanoTime();
 	pongThread.join();
 	long duration = System.nanoTime() - start;
-
+	if(pingValue.get() == pongValue.get()){
+	    return duration;
+	}
+	else{
+	    throw new RuntimeException();
+	}
 	// duration(ns),op-cost(ns),ops/sec,piV,poV
-	out.printf("%d,\t%d,\t%d,\t%d,\t%d\n", duration, duration / (ITERATIONS * 2L), 
-		(ITERATIONS * 2L * 1000000000L) / duration,pingValue.get(),pongValue.get());
+//	out.printf("%d,%d,%d,%d,%d\n", duration, duration / (ITERATIONS * 2L), 
+//		(ITERATIONS * 2L * 1000000000L) / duration,pingValue.get(),pongValue.get());
     }
 
-    public static final class PingRunner implements Runnable {
+    public final class PingRunner implements Runnable {
 	private final Counter pingValue;
 	private final Counter pongValue;
 	private final long iterations;
@@ -62,7 +70,7 @@ public final class PingPong {
 	}
     }
 
-    public static final class PongRunner implements Runnable {
+    public final class PongRunner implements Runnable {
 	private final Counter pingValue;
 	private final Counter pongValue;
 	private final long iterations;
@@ -82,8 +90,13 @@ public final class PingPong {
 	    }
 	}
     }
-    public static void main(final String[] args) throws Exception {
-	    System.out.print(args[0]+",\t"+args[1]+",\t");
-	    new PingPong(Counters.createCounter(args), Counters.createCounter(args));
+    public static void main(String[] args) throws Exception {
+	PingPong experiment = new PingPong(Counters.createCounter(args), Counters.createCounter(args));
+	long[] times = new long[20];
+	for (int i = 0; i < 20; i++) {
+	    times[i] = experiment.runOnce();
+	}
+	Arrays.sort(times);
+	out.printf("%s, %s, %s, %d, %d, %d\n",args[0],args[1],args[2],times[0],times[10],times[19]);
     }
 }

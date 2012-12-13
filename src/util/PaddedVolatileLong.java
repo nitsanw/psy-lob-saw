@@ -1,7 +1,7 @@
 package util;
 
 
-public final class PaddedLong {
+public final class PaddedVolatileLong {
     private static final long valueOffset;
 
     static {
@@ -16,10 +16,10 @@ public final class PaddedLong {
 
     private final long[] paddedValue = new long[15];
 
-    public PaddedLong() {
+    public PaddedVolatileLong() {
     }
 
-    public PaddedLong(final long initialValue) {
+    public PaddedVolatileLong(final long initialValue) {
 	setOrdered(initialValue);
     }
 

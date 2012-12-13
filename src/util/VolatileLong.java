@@ -2,48 +2,41 @@ package util;
 
 
 
-public final class SingleLong {
+public final class VolatileLong {
     private static final long valueOffset;
 
     static {
 	try {
-	    valueOffset = UnsafeAccess.unsafe.objectFieldOffset(SingleLong.class
+	    valueOffset = UnsafeAccess.unsafe.objectFieldOffset(VolatileLong.class
 		    .getDeclaredField("value"));
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}
     }
 
-    private long value = -1L;
+    private volatile long value;
 
-    public SingleLong() {
+    public VolatileLong() {
     }
 
-    public SingleLong(final long initialValue) {
-	setOrdered(initialValue);
+    public VolatileLong(final long initialValue) {
+	lazySet(initialValue);
     }
 
-    public long get() {
-	return value;
-    }
     public void set(final long value) {
 	this.value = value;
     }
-    public long getUnsafe() {
+    public long get() {
+	return value;
+    }
+    public long directGet() {
 	return UnsafeAccess.unsafe.getLong(this, valueOffset);
     }
-    public void setUnsafe(final long value) {
+    public void directSet(final long value) {
 	UnsafeAccess.unsafe.putLong(this, valueOffset, value);
     }
-    public void setOrdered(final long value) {
+    public void lazySet(final long value) {
 	UnsafeAccess.unsafe.putOrderedLong(this, valueOffset, value);
-    }
-
-    public void setVolatile(final long value) {
-	UnsafeAccess.unsafe.putLongVolatile(this, valueOffset, value);
-    }
-    public long getVolatile() {
-	return UnsafeAccess.unsafe.getLongVolatile(this, valueOffset);
     }
 
     public boolean compareAndSet(final long expectedValue, final long newValue) {
@@ -52,6 +45,6 @@ public final class SingleLong {
     }
 
     public String toString() {
-	return Long.toString(getVolatile());
+	return Long.toString(get());
     }
 }
