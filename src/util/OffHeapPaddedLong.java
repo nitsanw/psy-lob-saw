@@ -3,13 +3,13 @@ package util;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public final class DirectPaddedLong {
+public final class OffHeapPaddedLong {
     private final int CACHE_LINE_SIZE = 64;
     private final ByteBuffer buffy = ByteBuffer.allocateDirect(CACHE_LINE_SIZE + 8 * 15).order(
 	    ByteOrder.nativeOrder());
     private final long address;// = UnsafeDirectByteBuffer.getAddress(buffy) + 8 * 7;
 
-    public DirectPaddedLong() {
+    public OffHeapPaddedLong() {
 	long base = UnsafeDirectByteBuffer.getAddress(buffy);
 	// this should align the address to the nearest line
 	if((base & (CACHE_LINE_SIZE-1)) == 0){
@@ -20,7 +20,7 @@ public final class DirectPaddedLong {
 	}
     }
 
-    public DirectPaddedLong(final long initialValue) {
+    public OffHeapPaddedLong(final long initialValue) {
 	this();
 	setOrdered(initialValue);
     }

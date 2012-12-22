@@ -1,6 +1,8 @@
 <ivy-module version="2.0">
     <info organisation="psy.lob.saw" module="mama"/>
     <dependencies>
-		<dependency org="com.google.caliper" name="caliper" rev="0.5-rc1"/>        
+		<dependency org="com.google.caliper" name="caliper" rev="0.5-rc1">
+		  <exclude name='java-allocation-instrumenter' /> 
+		</dependency>
     </dependencies>
 </ivy-module>

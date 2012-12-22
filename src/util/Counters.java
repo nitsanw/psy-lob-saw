@@ -5,7 +5,7 @@ public abstract class Counters {
     }
 
     public static final class SinglePlainCounter implements Counter {
-	private final VolatileLong val = new VolatileLong(-1);
+	private final MemoryLong val = new VolatileLong(-1);
 
 	@Override
 	public void set(long l) {
@@ -14,7 +14,7 @@ public abstract class Counters {
 
 	@Override
 	public long get() {
-	    return val.get();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public abstract class Counters {
     }
 
     public static final class SingleOrderedCounter implements Counter {
-	private final VolatileLong val = new VolatileLong(-1);
+	private final MemoryLong val = new VolatileLong(-1);
 
 	@Override
 	public void set(long l) {
@@ -33,7 +33,7 @@ public abstract class Counters {
 
 	@Override
 	public long get() {
-	    return val.get();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -43,16 +43,16 @@ public abstract class Counters {
     }
 
     public static final class SingleVolatileCounter implements Counter {
-	private final VolatileLong val = new VolatileLong(-1);
+	private final MemoryLong val = new VolatileLong(-1);
 
 	@Override
 	public void set(long l) {
-	    val.set(l);
+	    val.volatileSet(l);
 	}
 
 	@Override
 	public long get() {
-	    return val.get();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -62,16 +62,16 @@ public abstract class Counters {
     }
 
     public static final class SingleDirectCounter implements Counter {
-	private final DirectLong val = new DirectLong(-1);
+	private final OffHeapLong val = new OffHeapLong(-1);
 
 	@Override
 	public void set(long l) {
-	    val.set(l);
+	    val.directSet(l);
 	}
 
 	@Override
 	public long get() {
-	    return val.getVolatile();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -138,16 +138,16 @@ public abstract class Counters {
     }
 
     public static final class DirectSinglePlainCounter implements Counter {
-	private final DirectLong val = new DirectLong(-1);
+	private final OffHeapLong val = new OffHeapLong(-1);
 
 	@Override
 	public void set(long l) {
-	    val.set(l);
+	    val.directSet(l);
 	}
 
 	@Override
 	public long get() {
-	    return val.getVolatile();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -157,16 +157,16 @@ public abstract class Counters {
     }
 
     public static final class DirectSingleOrderedCounter implements Counter {
-	private final DirectLong val = new DirectLong(-1);
+	private final OffHeapLong val = new OffHeapLong(-1);
 
 	@Override
 	public void set(long l) {
-	    val.setOrdered(l);
+	    val.lazySet(l);
 	}
 
 	@Override
 	public long get() {
-	    return val.getVolatile();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -176,16 +176,16 @@ public abstract class Counters {
     }
 
     public static final class DirectSingleVolatileCounter implements Counter {
-	private final DirectLong val = new DirectLong(-1);
+	private final OffHeapLong val = new OffHeapLong(-1);
 
 	@Override
 	public void set(long l) {
-	    val.setVolatile(l);
+	    val.volatileSet(l);
 	}
 
 	@Override
 	public long get() {
-	    return val.getVolatile();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -195,16 +195,16 @@ public abstract class Counters {
     }
 
     public static final class DirectSingleLongCounter implements Counter {
-	private final DirectLong val = new DirectLong(-1);
+	private final OffHeapLong val = new OffHeapLong(-1);
 
 	@Override
 	public void set(long l) {
-	    val.set(l);
+	    val.directSet(l);
 	}
 
 	@Override
 	public long get() {
-	    return val.getVolatile();
+	    return val.volatileGet();
 	}
 
 	@Override
@@ -214,7 +214,7 @@ public abstract class Counters {
     }
 
     public static final class DirectPaddedPlainCounter implements Counter {
-	private final DirectPaddedLong val = new DirectPaddedLong(-1);
+	private final OffHeapPaddedLong val = new OffHeapPaddedLong(-1);
 
 	@Override
 	public void set(long l) {
@@ -233,7 +233,7 @@ public abstract class Counters {
     }
 
     public static final class DirectPaddedOrderedCounter implements Counter {
-	private final DirectPaddedLong val = new DirectPaddedLong(-1);
+	private final OffHeapPaddedLong val = new OffHeapPaddedLong(-1);
 
 	@Override
 	public void set(long l) {
@@ -252,7 +252,7 @@ public abstract class Counters {
     }
 
     public static final class DirectPaddedVolatileCounter implements Counter {
-	private final DirectPaddedLong val = new DirectPaddedLong(-1);
+	private final OffHeapPaddedLong val = new OffHeapPaddedLong(-1);
 
 	@Override
 	public void set(long l) {

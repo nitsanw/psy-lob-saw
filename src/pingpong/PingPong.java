@@ -5,15 +5,10 @@ import static java.lang.System.out;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
-import catchup.Catchup;
-
 import util.Counter;
 import util.Counters;
-import util.DirectLong;
-import util.DirectPaddedLong;
 
 public final class PingPong {
-    private static final long WARMUP_ITERATIONS = 100L * 1000L;
     private static final long ITERATIONS = 10L * 1000L * 1000L;
 
 

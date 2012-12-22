@@ -2,49 +2,43 @@ package util;
 
 
 
-public final class VolatileLong implements MemoryLong {
+public final class VolatileLong2 implements MemoryLong  {
     private static final long valueOffset;
 
     static {
 	try {
-	    valueOffset = UnsafeAccess.unsafe.objectFieldOffset(VolatileLong.class
+	    valueOffset = UnsafeAccess.unsafe.objectFieldOffset(VolatileLong2.class
 		    .getDeclaredField("value"));
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}
     }
 
-    private volatile long value;
+    private long value;
 
-    public VolatileLong() {
+    public VolatileLong2() {
     }
 
-    public VolatileLong(final long initialValue) {
+    public VolatileLong2(final long initialValue) {
 	lazySet(initialValue);
     }
 
-    @Override
     public long volatileGet() {
-	return value;
-    }
-    @Override
-    public long directGet() {
 	return UnsafeAccess.unsafe.getLong(this, valueOffset);
     }
-    @Override
-    public void directSet(final long value) {
-	UnsafeAccess.unsafe.putLong(this, valueOffset, value);
+    public long directGet() {
+	return value;
     }
-    @Override
+    public void directSet(final long value) {
+	this.value = value;
+    }
     public void lazySet(final long value) {
 	UnsafeAccess.unsafe.putOrderedLong(this, valueOffset, value);
     }
-    @Override
     public void volatileSet(final long value) {
-	this.value = value;
+	UnsafeAccess.unsafe.putLongVolatile(this, valueOffset, value);
     }
 
-    @Override
     public boolean compareAndSet(final long expectedValue, final long newValue) {
 	return UnsafeAccess.unsafe.compareAndSwapLong(this, valueOffset,
 		expectedValue, newValue);
