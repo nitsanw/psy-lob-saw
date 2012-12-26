@@ -12,20 +12,19 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
     @Param(value = "1")
     int offset;
 
-    private static final int CAPACITY = PAGE_SIZE;
     // buffy is a page aligned buffer, and a vampire slayer
-    private ByteBuffer buffy = allocateAlignedByteBuffer(CAPACITY, PAGE_SIZE);
+    private ByteBuffer buffy = allocateAlignedByteBuffer(PAGE_SIZE, PAGE_SIZE);
 
     public int timeOffsetLongAccess(final int reps) throws InterruptedException {
 	long remaining = 0;
 	long startingAddress = getAddress(buffy);
 	// skip first line if not straddling 2 cache lines
-	if(offset+8<CACHE_LINE_SIZE){
+	if (offset + 8 < CACHE_LINE_SIZE) {
 	    startingAddress += CACHE_LINE_SIZE + offset;
-	}else{
+	} else {
 	    startingAddress += offset;
 	}
-	final long limit = getAddress(buffy) + CAPACITY;
+	final long limit = getAddress(buffy) + PAGE_SIZE;
 	for (long i = 0; i < reps; i++) {
 	    remaining = writeAndRead(i, startingAddress, limit);
 	}
@@ -34,13 +33,15 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
 
     private long writeAndRead(final long value, final long startingAddress,
 	    final long limit) {
-	long address;
-	for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
-	    UnsafeAccess.unsafe.putLong(address, value);
-	}
-	for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
-	    if (UnsafeAccess.unsafe.getLong(address) != value)
-		throw new RuntimeException();
+	long address = startingAddress;
+	for (int i = 0; i < 100; i++) {
+	    for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
+		UnsafeAccess.unsafe.putLong(address, value);
+	    }
+	    for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
+		if (UnsafeAccess.unsafe.getLong(address) != value)
+		    throw new RuntimeException();
+	    }
 	}
 	return limit - address + CACHE_LINE_SIZE;
     }
