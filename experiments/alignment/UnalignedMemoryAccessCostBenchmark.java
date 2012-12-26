@@ -8,7 +8,7 @@ import static util.UnsafeDirectByteBuffer.*;
 import com.google.caliper.Param;
 import com.google.caliper.SimpleBenchmark;
 
-public class UnsafeCacheAlignmentCostBenchmark extends SimpleBenchmark {
+public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
     @Param(value = "1")
     int offset;
 
@@ -18,9 +18,15 @@ public class UnsafeCacheAlignmentCostBenchmark extends SimpleBenchmark {
 
     public int timeOffsetLongAccess(final int reps) throws InterruptedException {
 	long remaining = 0;
+	long startingAddress = getAddress(buffy);
+	// skip first line if not straddling 2 cache lines
+	if(offset+8<CACHE_LINE_SIZE){
+	    startingAddress += CACHE_LINE_SIZE + offset;
+	}else{
+	    startingAddress += offset;
+	}
+	final long limit = getAddress(buffy) + CAPACITY;
 	for (long i = 0; i < reps; i++) {
-	    final long startingAddress = getAddress(buffy) + offset;
-	    final long limit = getAddress(buffy) + CAPACITY;
 	    remaining = writeAndRead(i, startingAddress, limit);
 	}
 	return (int) remaining;
