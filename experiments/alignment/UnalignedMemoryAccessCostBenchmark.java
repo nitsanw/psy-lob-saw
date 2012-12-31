@@ -9,12 +9,17 @@ import com.google.caliper.Param;
 import com.google.caliper.SimpleBenchmark;
 
 public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
-    @Param(value = "1")
+    @Param(value = "0")
     int offset;
+    @Param(value = "1")
+    int sizeInPages;
 
     // buffy is a page aligned buffer, and a vampire slayer
-    private ByteBuffer buffy = allocateAlignedByteBuffer(PAGE_SIZE, PAGE_SIZE);
-
+    private ByteBuffer buffy;
+    @Override
+    protected void setUp() throws Exception {
+	buffy = allocateAlignedByteBuffer(sizeInPages*PAGE_SIZE, PAGE_SIZE);
+    }
     public int timeOffsetLongAccess(final int reps) throws InterruptedException {
 	long remaining = 0;
 	long startingAddress = getAddress(buffy);
@@ -24,7 +29,7 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
 	} else {
 	    startingAddress += offset;
 	}
-	final long limit = getAddress(buffy) + PAGE_SIZE;
+	final long limit = getAddress(buffy) + buffy.remaining();
 	for (long i = 0; i < reps; i++) {
 	    remaining = writeAndRead(i, startingAddress, limit);
 	}
@@ -34,7 +39,8 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
     private long writeAndRead(final long value, final long startingAddress,
 	    final long limit) {
 	long address = startingAddress;
-	for (int i = 0; i < 100; i++) {
+	final int repeat = 2048/sizeInPages;
+	for (int i = 0; i < repeat; i++) {
 	    for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
 		UnsafeAccess.unsafe.putLong(address, value);
 	    }

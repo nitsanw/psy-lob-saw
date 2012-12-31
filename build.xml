@@ -4,6 +4,7 @@
 	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
 	<property name="build.dir" value="build" />
 	<property name="src.dir" value="src" />
+	<property name="experiments.dir" value="experiments" />
 	<target name="download-ivy" unless="skip.download">
 		<mkdir dir="${ivy.jar.dir}" />
 		<!-- 
@@ -26,10 +27,27 @@
 	</target>
 
 	<target name="build" depends="install-ivy" description=" resolve dependencies, compile and run the project">
-		<ivy:cachepath organisation="commons-lang" module="commons-lang" revision="2.1" pathid="lib.path.id" inline="true" />
+		<ivy:retrieve />
+		<ivy:cachepath pathid="lib.path.id" />
 		<echo message="compiling..." />
 		<mkdir dir="${build.dir}" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
+		<javac srcdir="${experiments.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
+	</target>
+	<target name="run-unaligned-experiments" depends="build" description=" run experiments">
+		<ivy:retrieve />
+		<ivy:cachepath pathid="lib.path.id" />
+		<echo message="running experiments..." />
+		<java classpathref="lib.path.id" classname="com.google.caliper.Runner" fork="true">
+			<classpath path="${build.dir}"/>
+			<arg value="--warmupMillis"/>
+			<arg value="1000"/>
+			<arg value="--runMillis"/>
+				<arg value="5000"/>
+			<arg value="alignment.UnalignedMemoryAccessCostBenchmark"/>
+			<arg value="-Doffset=0,1,2,3,4,5,6,7,8,16,24,32,40,48,56,60"/>
+			<arg value="-Dsize=1,2,4,8,16,32,64,128,256,512,1024,2048"/>
+		</java>
 	</target>
 
 	<target name="clean" description="--> clean the project">
