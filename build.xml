@@ -46,7 +46,7 @@
 				<arg value="5000"/>
 			<arg value="alignment.UnalignedMemoryAccessCostBenchmark"/>
 			<arg value="-Doffset=0,1,2,3,4,5,6,7,8,16,24,32,40,48,56,60"/>
-			<arg value="-Dsize=1,2,4,8,16,32,64,128,256,512,1024,2048"/>
+			<arg value="-DsizeInPages=1,2,4,8,16,32,64,128,256,512,1024,2048"/>
 		</java>
 	</target>
 
