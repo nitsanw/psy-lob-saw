@@ -38,9 +38,11 @@ public class UnsafeDirectByteBuffer {
 	if(Long.bitCount(align) != 1){
 	    throw new IllegalArgumentException("Alignment must be a power of 2");
 	}
-	ByteBuffer buffy = ByteBuffer.allocateDirect((int)(capacity+align)).order(ByteOrder.nativeOrder());
+	ByteBuffer buffy = ByteBuffer.allocateDirect((int)(capacity+align));
 	long address = getAddress(buffy);
 	if((address & (align-1)) == 0){
+	    buffy.limit(capacity);
+	    buffy = buffy.slice().order(ByteOrder.nativeOrder());;
 	    return buffy;
 	}
 	else{
@@ -48,7 +50,8 @@ public class UnsafeDirectByteBuffer {
 	    buffy.position(newPosition);
 	    int newLimit = newPosition + capacity;
 	    buffy.limit(newLimit);
-	    return buffy.slice();
+	    buffy = buffy.slice().order(ByteOrder.nativeOrder());;
+	    return buffy;
 	}
     }
     public static boolean isPageAligned(ByteBuffer buffy){
