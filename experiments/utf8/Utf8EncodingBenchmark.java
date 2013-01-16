@@ -12,12 +12,13 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 
 import com.google.caliper.Param;
+import com.google.caliper.Runner;
 import com.google.caliper.SimpleBenchmark;
 
 public class Utf8EncodingBenchmark extends SimpleBenchmark {
     @Param(value = "utf8.txt")
     String stringsFile;
-    @Param(value = "true")
+    @Param({"true","false"})
     boolean direct;
     private ArrayList<String> strings = new ArrayList<String>();
     private ByteBuffer dest;
@@ -44,16 +45,20 @@ public class Utf8EncodingBenchmark extends SimpleBenchmark {
 	    if(reader != null)
 		reader.close();
 	}
-	if (direct) {
-	    dest = ByteBuffer.allocateDirect(4096);
-	} else {
-	    dest = ByteBuffer.allocate(4096);
-	}
+	initDest();
 	chars = new char[4096];
 	charBuffer = CharBuffer.wrap(chars);
 	encoder = Charset.forName("UTF-8").newEncoder();
 	customEncoder = new CustomUtf8Encoder();
 
+    }
+
+    private void initDest() {
+	if (direct) {
+	    dest = ByteBuffer.allocateDirect(4096);
+	} else {
+	    dest = ByteBuffer.allocate(4096);
+	}
     }
 
     public int timeCustomEncoder(int reps) {
@@ -96,5 +101,7 @@ public class Utf8EncodingBenchmark extends SimpleBenchmark {
 	}
 	return countBytes;
     }
-
+    public static void main(String[] args) throws Exception {
+	Runner.main(Utf8EncodingBenchmark.class, args);
+    }
 }
