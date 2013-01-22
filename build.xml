@@ -2,16 +2,35 @@
 	<property name="ivy.install.version" value="2.0.0-beta1" />
 	<property name="ivy.jar.dir" value="${basedir}/ivy" />
 	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+	<property name="allocation.jar.file" value="${basedir}/lib/allocation.jar" />
+	<condition property="skip.download.ivy">
+		<and>
+			<available file="${ivy.jar.file}"/>
+		</and>
+	</condition>
+	<condition property="skip.download.allocation">
+		<and>
+			<available file="${allocation.jar.file}"/>
+		</and>
+	</condition>
 	<property name="build.dir" value="build" />
 	<property name="src.dir" value="src" />
 	<property name="experiments.dir" value="experiments" />
-	<target name="download-ivy" unless="skip.download">
+	<target name="download-ivy" unless="skip.download.ivy">
 		<mkdir dir="${ivy.jar.dir}" />
 		<!-- 
 		download Ivy from web site so that it can be used even without any special installation
 		-->
-		<echo message="installing ivy..." />
+		<echo message="downloading ivy..." />
 		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+	</target>
+	<target name="download-allocation-jar" unless="skip.download.allocation">
+		<mkdir dir="lib" />
+		<!-- 
+			download allocation jar, I'm sure there's a better way to do this with Ivy, but fuck it
+			-->
+		<echo message="downloading allocation jar.." />
+		<get src="http://java-allocation-instrumenter.googlecode.com/files/allocation.jar" dest="${allocation.jar.file}" usetimestamp="true" />
 	</target>
 	<!--
 	this target is not necessary if you put ivy.jar in your ant lib directory if you already have ivy in your ant lib, you can simply remove this target and the dependency the 'go' target has on it =================================
@@ -27,15 +46,25 @@
 	</target>
 
 	<target name="build" depends="install-ivy" description=" resolve dependencies, compile and run the project">
-		<ivy:retrieve />
 		<ivy:cachepath pathid="lib.path.id" />
 		<echo message="compiling..." />
 		<mkdir dir="${build.dir}" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
 		<javac srcdir="${experiments.dir}" destdir="${build.dir}" classpathref="lib.path.id" />
 	</target>
+	<target name="benchmark-utf8-encoding" depends="build,download-allocation-jar" description=" run experiments">
+		<ivy:cachepath pathid="lib.path.id" />
+		
+		<java classpathref="lib.path.id" classname="utf8.Utf8EncodingBenchmark" fork="true">
+		    <classpath>
+		      <pathelement path="${build.dir}"/>
+		      <pathelement location="${allocation.jar.file}"/>
+		    </classpath>
+			<env key="ALLOCATION_JAR" value="${allocation.jar.file}"/>
+			<arg value="--measureMemory" />
+		</java>
+	</target>
 	<target name="run-unaligned-experiments" depends="build" description=" run experiments">
-		<ivy:retrieve />
 		<ivy:cachepath pathid="lib.path.id" />
 		<echo message="running experiments..." />
 		<java classpathref="lib.path.id" classname="com.google.caliper.Runner" fork="true">
@@ -50,7 +79,6 @@
 		</java>
 	</target>
 	<target name="run-unaligned-fibonacci" depends="build" description=" run experiments">
-		<ivy:retrieve />
 		<ivy:cachepath pathid="lib.path.id" />
 		<echo message="running experiments..." />
 		<java classpathref="lib.path.id" classname="com.google.caliper.Runner" fork="true">
@@ -64,16 +92,13 @@
 			<arg value="-DsizeInPages=1,2,4,8,16,32,64,128,256,512,1024,2048" />
 		</java>
 	</target>
-	<target name="run-page" depends="build" description=" run experiments">
-		<ivy:retrieve />
+	<target name="run-page-io" depends="build" description=" run experiments">
 		<ivy:cachepath pathid="lib.path.id" />
 		<echo message="running experiments..." />
 		<java classpathref="lib.path.id" classname="com.google.caliper.Runner" fork="true">
 			<classpath path="${build.dir}" />
-			<arg value="--warmupMillis" />
-			<arg value="1000" />
-			<arg value="--runMillis" />
-			<arg value="5000" />
+			<arg value="--trials" />
+			<arg value="10" />
 			<arg value="alignment.UnalignedPageIOBenchmark" />
 		</java>
 	</target>
