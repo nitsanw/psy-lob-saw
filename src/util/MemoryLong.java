@@ -2,16 +2,16 @@ package util;
 
 public interface MemoryLong {
 
-    long volatileGet();
+	long volatileGet();
 
-    long directGet();
+	long directGet();
 
-    void directSet(long value);
+	void directSet(long value);
 
-    void lazySet(long value);
+	void lazySet(long value);
 
-    void volatileSet(long value);
+	void volatileSet(long value);
 
-    boolean compareAndSet(long expectedValue, long newValue);
+	boolean compareAndSet(long expectedValue, long newValue);
 
 }

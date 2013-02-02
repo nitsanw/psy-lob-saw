@@ -1,7 +1,7 @@
 package util;
 
 public interface Counter {
-    long get();
+	long get();
 
-    void set(long l);
+	void set(long l);
 }
