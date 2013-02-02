@@ -16,10 +16,12 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
 
     // buffy is a page aligned buffer, and a vampire slayer
     private ByteBuffer buffy;
+
     @Override
     protected void setUp() throws Exception {
-	buffy = allocateAlignedByteBuffer(sizeInPages*PAGE_SIZE, PAGE_SIZE);
+	buffy = allocateAlignedByteBuffer(sizeInPages * PAGE_SIZE, PAGE_SIZE);
     }
+
     public int timeOffsetLongAccess(final int reps) throws InterruptedException {
 	long remaining = 0;
 	long startingAddress = getAddress(buffy);
@@ -39,7 +41,7 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
     private long writeAndRead(final long value, final long startingAddress,
 	    final long limit) {
 	long address = startingAddress;
-	final int repeat = 2048/sizeInPages;
+	final int repeat = 2048 / sizeInPages;
 	for (int i = 0; i < repeat; i++) {
 	    for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
 		UnsafeAccess.unsafe.putLong(address, value);

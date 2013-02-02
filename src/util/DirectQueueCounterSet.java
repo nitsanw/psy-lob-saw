@@ -5,9 +5,10 @@ import java.nio.ByteOrder;
 
 public final class DirectQueueCounterSet {
     private static final int PADDING_SIZE = 8 * 7;
-    private final ByteBuffer buffy = ByteBuffer.allocateDirect(PADDING_SIZE*6+8*4).order(
-	    ByteOrder.nativeOrder());
-    private final long headAddress = UnsafeDirectByteBuffer.getAddress(buffy) + PADDING_SIZE;
+    private final ByteBuffer buffy = ByteBuffer.allocateDirect(
+	    PADDING_SIZE * 6 + 8 * 4).order(ByteOrder.nativeOrder());
+    private final long headAddress = UnsafeDirectByteBuffer.getAddress(buffy)
+	    + PADDING_SIZE;
     private final long tailAddress = headAddress + 8 + PADDING_SIZE;
     private final long headCacheAddress = tailAddress + 8 + PADDING_SIZE;;
     private final long tailCacheAddress = headCacheAddress + 8 + PADDING_SIZE;;
@@ -29,6 +30,7 @@ public final class DirectQueueCounterSet {
     public void setHead(final long value) {
 	UnsafeAccess.unsafe.putLong(headAddress, value);
     }
+
     public long getTail() {
 	return UnsafeAccess.unsafe.getLongVolatile(null, tailAddress);
     }
@@ -36,6 +38,7 @@ public final class DirectQueueCounterSet {
     public void setTail(final long value) {
 	UnsafeAccess.unsafe.putLong(tailAddress, value);
     }
+
     public long getHeadCache() {
 	return UnsafeAccess.unsafe.getLong(null, headCacheAddress);
     }
@@ -43,6 +46,7 @@ public final class DirectQueueCounterSet {
     public void setHeadCache(final long value) {
 	UnsafeAccess.unsafe.putLong(headCacheAddress, value);
     }
+
     public long getTailCache() {
 	return UnsafeAccess.unsafe.getLong(null, tailCacheAddress);
     }
@@ -52,7 +56,7 @@ public final class DirectQueueCounterSet {
     }
 
     public String toString() {
-	return "head:" + getHead()+" tail:" + getTail();
+	return "head:" + getHead() + " tail:" + getTail();
     }
 
 }

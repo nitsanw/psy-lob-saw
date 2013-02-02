@@ -10,7 +10,7 @@ import util.Counters;
 
 public final class Catchup {
     private static final long ITERATIONS = 100L * 1000L * 1000L;
-    
+
     private static final long[] values = new long[(int) ITERATIONS];
     private Counter producerIndex;
     private long consumerIndex = -1L;
@@ -30,7 +30,7 @@ public final class Catchup {
 	Thread pingThread = new Thread(new Producer());
 	pongThread.start();
 	pingThread.start();
-	
+
 	latch.await();
 
 	long start = System.nanoTime();
@@ -41,10 +41,11 @@ public final class Catchup {
 
 	return duration;
 	// executions,duration(ns),ns/op,ops/sec,catchV,coughtV
-//	out.printf("duration %,d (ns);", duration);
-//	out.printf("%,d ns/op;", duration / ITERATIONS);
-//	out.printf("%,d ops/s;", (ITERATIONS * 1000000000L) / duration);
-//	out.println("pingValue = " + catchValue + ", pongValue = " + catchupValue);
+	// out.printf("duration %,d (ns);", duration);
+	// out.printf("%,d ns/op;", duration / ITERATIONS);
+	// out.printf("%,d ops/s;", (ITERATIONS * 1000000000L) / duration);
+	// out.println("pingValue = " + catchValue + ", pongValue = " +
+	// catchupValue);
     }
 
     final class Producer implements Runnable {
@@ -70,9 +71,10 @@ public final class Catchup {
 			System.out.println("Abort!");
 		}
 	    }
-//	    out.printf("executions %,d;\t", executions);
+	    // out.printf("executions %,d;\t", executions);
 	}
     }
+
     public static void main(String[] args) throws Exception {
 	Catchup experiment = new Catchup(Counters.createCounter(args));
 	long[] times = new long[20];
@@ -80,6 +82,7 @@ public final class Catchup {
 	    times[i] = experiment.runOnce();
 	}
 	Arrays.sort(times);
-	out.printf("%s, %s, %s, %d, %d, %d\n",args[0],args[1],args[2],times[0],times[10],times[19]);
+	out.printf("%s, %s, %s, %d, %d, %d\n", args[0], args[1], args[2],
+		times[0], times[10], times[19]);
     }
 }

@@ -67,9 +67,8 @@ public class UnalignedPageSocketIOBenchmark extends SimpleBenchmark {
 		    // TODO Auto-generated catch block
 		    failed = e;
 		    waitForAccept.countDown();
-		}
-		finally{
-		    if (server != null){
+		} finally {
+		    if (server != null) {
 			try {
 			    server.close();
 			} catch (IOException e) {
@@ -85,7 +84,8 @@ public class UnalignedPageSocketIOBenchmark extends SimpleBenchmark {
 	client.configureBlocking(false);
 	client.socket().setReceiveBufferSize(PAGE_SIZE);
 	client.connect(new InetSocketAddress(host, port));
-	while(!client.finishConnect());
+	while (!client.finishConnect())
+	    ;
 	waitForAccept.await();
 	if (failed != null) {
 	    throw failed;
@@ -97,7 +97,7 @@ public class UnalignedPageSocketIOBenchmark extends SimpleBenchmark {
     protected void tearDown() throws Exception {
 	if (client != null)
 	    client.close();
-	
+
     }
 
     public int timeOffsetPageIO(final int reps) throws IOException {
@@ -109,14 +109,14 @@ public class UnalignedPageSocketIOBenchmark extends SimpleBenchmark {
 
     private void ping(int i) throws IOException {
 	buffy.putInt(0, i);
-	do{
+	do {
 	    client.write(buffy);
 	} while (buffy.hasRemaining());
 	buffy.clear();
 	buffy.putInt(0, 0);
-	do{
+	do {
 	    client.read(buffy);
-	}while (buffy.hasRemaining());
+	} while (buffy.hasRemaining());
 	if (buffy.getInt(0) != i)
 	    throw new RuntimeException();
 	buffy.clear();

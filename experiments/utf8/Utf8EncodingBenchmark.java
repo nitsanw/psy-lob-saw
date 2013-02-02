@@ -18,7 +18,7 @@ import com.google.caliper.SimpleBenchmark;
 public class Utf8EncodingBenchmark extends SimpleBenchmark {
     @Param(value = "utf8.txt")
     String stringsFile;
-    @Param({"true","false"})
+    @Param({ "true", "false" })
     boolean direct;
     private ArrayList<String> strings = new ArrayList<String>();
     private ByteBuffer dest;
@@ -40,9 +40,8 @@ public class Utf8EncodingBenchmark extends SimpleBenchmark {
 	    }
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
-	}
-	finally{
-	    if(reader != null)
+	} finally {
+	    if (reader != null)
 		reader.close();
 	}
 	initDest();
@@ -101,6 +100,7 @@ public class Utf8EncodingBenchmark extends SimpleBenchmark {
 	}
 	return countBytes;
     }
+
     public static void main(String[] args) throws Exception {
 	Runner.main(Utf8EncodingBenchmark.class, args);
     }

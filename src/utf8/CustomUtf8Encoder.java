@@ -1,4 +1,5 @@
 package utf8;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.CoderResult;
 
@@ -21,12 +22,12 @@ public class CustomUtf8Encoder {
     private int lastSp;
     private int lastDp;
 
-    
     /**
-     * Encodes a string into the byte buffer using the UTF-8 encoding. Like the 
-     * JDK encoder this will return UNDERFLOW on success and ERROR/OVERFLOW otherwise,
-     * but unlike the JDK encode it does not allow resuming the operation and will
-     * not move the byte buffer position should the string not fit in it.
+     * Encodes a string into the byte buffer using the UTF-8 encoding. Like the
+     * JDK encoder this will return UNDERFLOW on success and ERROR/OVERFLOW
+     * otherwise, but unlike the JDK encode it does not allow resuming the
+     * operation and will not move the byte buffer position should the string
+     * not fit in it.
      * 
      * @param src
      * @param dst
@@ -38,13 +39,16 @@ public class CustomUtf8Encoder {
 	else
 	    return encodeStringToDirect(src, dst);
     }
+
     public final CoderResult encodeStringToDirect(String src, ByteBuffer dst) {
 	lastDp = 0;
 	int dp = dst.position();
 	int dl = dst.limit();
 
-	// in JDK7 offset is always 0, but earlier versions accomodated substrings
-	// pointing back to original array and having a separate offset and length.
+	// in JDK7 offset is always 0, but earlier versions accomodated
+	// substrings
+	// pointing back to original array and having a separate offset and
+	// length.
 	int spCurr = UnsafeString.getOffset(src);
 	int sl = src.length();
 
@@ -52,32 +56,40 @@ public class CustomUtf8Encoder {
 	CoderResult result = encode(UnsafeString.getChars(src), spCurr, sl,
 		UnsafeDirectByteBuffer.getAddress(dst), dp, dl);
 	// only move the position if we fit the whole thing in.
-	if(lastDp != 0)
+	if (lastDp != 0)
 	    dst.position(lastDp);
 	return result;
 
     }
 
     /**
-     * The parameter naming is from the JDK source and I kept it to make diffing easier.
-     * The s stands for source, the d for destination. It actually grew on me as I played
-     * with the code, but I agree longer names are more readable.
+     * The parameter naming is from the JDK source and I kept it to make diffing
+     * easier. The s stands for source, the d for destination. It actually grew
+     * on me as I played with the code, but I agree longer names are more
+     * readable.
      * 
-     * @param sa source char array
-     * @param spCurr the source position starting point
-     * @param sl source array length/limit
-     * @param dAddress destination address(plucked out of Buffer using Unsafe)
-     * @param dp destination position
-     * @param dl destination limit
+     * @param sa
+     *            source char array
+     * @param spCurr
+     *            the source position starting point
+     * @param sl
+     *            source array length/limit
+     * @param dAddress
+     *            destination address(plucked out of Buffer using Unsafe)
+     * @param dp
+     *            destination position
+     * @param dl
+     *            destination limit
      * @return UNDERFLOW is successful, OVERFLOW/ERROR otherwise
      */
-    private final CoderResult encode(char[] sa, int spCurr, int sl, long dAddress, int dp,
-	    int dl) {
+    private final CoderResult encode(char[] sa, int spCurr, int sl,
+	    long dAddress, int dp, int dl) {
 	lastSp = spCurr;
 	int dlASCII = Math.min(sl - lastSp, dl - dp);
 	// handle ascii encoded strings in an optimised loop
 	while (dp < dlASCII && sa[lastSp] < 128)
-	    // TODO: could arguably skip this utility and compute the target address
+	    // TODO: could arguably skip this utility and compute the target
+	    // address
 	    // directly...
 	    UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) sa[lastSp++]);
 
@@ -90,8 +102,10 @@ public class CustomUtf8Encoder {
 	    } else if (c < 2048) {
 		if (dl - dp < 2)
 		    return CoderResult.OVERFLOW;
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0xC0 | (c >> 6)));
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0x80 | (c & 0x3F)));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0xC0 | (c >> 6)));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0x80 | (c & 0x3F)));
 	    } else if (Surrogate.is(c)) {
 		int uc = sgp.parse((char) c, sa, lastSp, sl);
 		if (uc < 0) {
@@ -100,17 +114,24 @@ public class CustomUtf8Encoder {
 		}
 		if (dl - dp < 4)
 		    return CoderResult.OVERFLOW;
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0xF0 | uc >> 18));
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0x80 | uc >> 12 & 0x3F));
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0x80 | uc >> 6 & 0x3F));
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0x80 | uc & 0x3F));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0xF0 | uc >> 18));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0x80 | uc >> 12 & 0x3F));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0x80 | uc >> 6 & 0x3F));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0x80 | uc & 0x3F));
 		++lastSp;
 	    } else {
 		if (dl - dp < 3)
 		    return CoderResult.OVERFLOW;
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0xE0 | c >> 12));
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0x80 | c >> 6 & 0x3F));
-		UnsafeDirectByteBuffer.putByte(dAddress, dp++, (byte) (0x80 | c & 0x3F));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0xE0 | c >> 12));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0x80 | c >> 6 & 0x3F));
+		UnsafeDirectByteBuffer.putByte(dAddress, dp++,
+			(byte) (0x80 | c & 0x3F));
 	    }
 	    ++lastSp;
 	}
@@ -146,8 +167,10 @@ public class CustomUtf8Encoder {
 	while (dp < dlASCII && sa[lastSp] < 128)
 	    da[dp++] = (byte) sa[lastSp++];
 
-	// we are counting on the JVM array boundary checks to throw an exception rather then
-	// checkin boundaries ourselves... no nice, and potentailly not that much of a
+	// we are counting on the JVM array boundary checks to throw an
+	// exception rather then
+	// checkin boundaries ourselves... no nice, and potentailly not that
+	// much of a
 	// performance enhancement.
 	while (lastSp < sl) {
 	    int c = sa[lastSp];

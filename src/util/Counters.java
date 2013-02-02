@@ -300,13 +300,13 @@ public abstract class Counters {
 	String method = args[2];
 	if (access.equals("plain")) {
 	    if (size.equals("single")) {
-		if(method.equals("plain")){
+		if (method.equals("plain")) {
 		    type = new Counters.SinglePlainCounter();
 		} else if (method.equals("direct")) {
 		    type = new Counters.DirectSinglePlainCounter();
 		}
 	    } else if (size.equals("padded")) {
-		if(method.equals("plain")){
+		if (method.equals("plain")) {
 		    type = new Counters.PaddedPlainCounter();
 		} else if (method.equals("direct")) {
 		    type = new Counters.DirectPaddedPlainCounter();
@@ -314,13 +314,13 @@ public abstract class Counters {
 	    }
 	} else if (access.equals("ordered")) {
 	    if (size.equals("single")) {
-		if(method.equals("plain")){
+		if (method.equals("plain")) {
 		    type = new Counters.SingleOrderedCounter();
 		} else if (method.equals("direct")) {
 		    type = new Counters.DirectSingleOrderedCounter();
 		}
 	    } else if (size.equals("padded")) {
-		if(method.equals("plain")){
+		if (method.equals("plain")) {
 		    type = new Counters.PaddedOrderedCounter();
 		} else if (method.equals("direct")) {
 		    type = new Counters.DirectPaddedOrderedCounter();
@@ -328,25 +328,24 @@ public abstract class Counters {
 	    }
 	} else if (access.equals("volatile")) {
 	    if (size.equals("single")) {
-		if(method.equals("plain")){
+		if (method.equals("plain")) {
 		    type = new Counters.SingleVolatileCounter();
 		} else if (method.equals("direct")) {
 		    type = new Counters.DirectSingleVolatileCounter();
 		}
 	    } else if (size.equals("padded")) {
-		if(method.equals("plain")){
+		if (method.equals("plain")) {
 		    type = new Counters.PaddedVolatileCounter();
 		} else if (method.equals("direct")) {
 		    type = new Counters.DirectPaddedVolatileCounter();
 		}
 	    }
-	} 
-	if(type == null){
+	}
+	if (type == null) {
 	    throw new RuntimeException(
 		    "Require couter type in 3 strings: [plain | ordered | volatile] [single | padded] [direct | plain] ");
 
-	}
-	else{
+	} else {
 	    return type;
 	}
     }

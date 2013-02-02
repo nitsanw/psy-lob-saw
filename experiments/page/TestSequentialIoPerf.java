@@ -1,4 +1,5 @@
 package page;
+
 import static java.lang.System.out;
 import static util.UnsafeDirectByteBuffer.PAGE_SIZE;
 import static util.UnsafeDirectByteBuffer.allocateAlignedByteBuffer;
@@ -18,9 +19,9 @@ public final class TestSequentialIoPerf {
 
 	for (final PerfTestCase testCase : testCases) {
 	    for (int i = 0; i < 20; i++) {
-		String fileName = FILE_NAME+i;
+		String fileName = FILE_NAME + i;
 
-//		preallocateTestFile(fileName);
+		// preallocateTestFile(fileName);
 		System.gc();
 		long writeDurationMs = testCase.test(PerfTestCase.Type.WRITE,
 			fileName);
@@ -37,7 +38,7 @@ public final class TestSequentialIoPerf {
 		deleteFile(fileName);
 	    }
 	}
-	
+
     }
 
     private static void preallocateTestFile(final String fileName)
@@ -108,14 +109,14 @@ public final class TestSequentialIoPerf {
     }
 
     private static PerfTestCase[] testCases = {
-	new PerfTestCase("BufferedChannelFileU") {
+	    new PerfTestCase("BufferedChannelFileU") {
 		public int testWrite(final String fileName) throws Exception {
 		    FileChannel channel = new RandomAccessFile(fileName, "rw")
 			    .getChannel();
 		    ByteBuffer buffer = allocateAlignedByteBuffer(
 			    2 * PAGE_SIZE, PAGE_SIZE);
 		    buffer.position(PAGE_SIZE / 2);
-		    buffer.limit(PAGE_SIZE / 2  + PAGE_SIZE);
+		    buffer.limit(PAGE_SIZE / 2 + PAGE_SIZE);
 		    buffer = buffer.slice().order(ByteOrder.nativeOrder());
 		    int checkSum = 0;
 		    int pos = 0;
@@ -158,8 +159,7 @@ public final class TestSequentialIoPerf {
 
 		    return checkSum;
 		}
-	    },
-		new PerfTestCase("BufferedChannelFileU1") {
+	    }, new PerfTestCase("BufferedChannelFileU1") {
 		public int testWrite(final String fileName) throws Exception {
 		    FileChannel channel = new RandomAccessFile(fileName, "rw")
 			    .getChannel();
@@ -210,7 +210,6 @@ public final class TestSequentialIoPerf {
 		    return checkSum;
 		}
 	    },
-
 
 	    // new PerfTestCase("BufferedStreamFile")
 	    // {
@@ -295,7 +294,7 @@ public final class TestSequentialIoPerf {
 
 		    return checkSum;
 		}
-	    },  new PerfTestCase("BufferedChannelFileH") {
+	    }, new PerfTestCase("BufferedChannelFileH") {
 		public int testWrite(final String fileName) throws Exception {
 		    FileChannel channel = new RandomAccessFile(fileName, "rw")
 			    .getChannel();
@@ -337,8 +336,7 @@ public final class TestSequentialIoPerf {
 
 		    return checkSum;
 		}
-	    },
-	    new PerfTestCase("RandomAccessFile") {
+	    }, new PerfTestCase("RandomAccessFile") {
 		public int testWrite(final String fileName) throws Exception {
 		    RandomAccessFile file = new RandomAccessFile(fileName, "rw");
 		    final byte[] buffer = new byte[PAGE_SIZE];
@@ -377,6 +375,5 @@ public final class TestSequentialIoPerf {
 
 		    return checkSum;
 		}
-	    },
-    };
+	    }, };
 }
