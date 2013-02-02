@@ -1,3 +1,4 @@
+package page;
 import static java.lang.System.out;
 import static util.UnsafeDirectByteBuffer.PAGE_SIZE;
 import static util.UnsafeDirectByteBuffer.allocateAlignedByteBuffer;
@@ -9,31 +10,34 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
 public final class TestSequentialIoPerf {
-    public static final long FILE_SIZE = PAGE_SIZE * 2000L * 1000L;
+    public static final long FILE_SIZE = PAGE_SIZE * 100L * 1000L;
     public static final String FILE_NAME = "test.dat";
     public static final byte[] BLANK_PAGE = new byte[PAGE_SIZE];
 
     public static void main(final String[] arg) throws Exception {
-	preallocateTestFile(FILE_NAME);
 
 	for (final PerfTestCase testCase : testCases) {
-	    for (int i = 0; i < 5; i++) {
+	    for (int i = 0; i < 20; i++) {
+		String fileName = FILE_NAME+i;
+
+//		preallocateTestFile(fileName);
 		System.gc();
 		long writeDurationMs = testCase.test(PerfTestCase.Type.WRITE,
-			FILE_NAME);
+			fileName);
 
 		System.gc();
 		long readDurationMs = testCase.test(PerfTestCase.Type.READ,
-			FILE_NAME);
+			fileName);
 
 		long bytesReadPerSec = (FILE_SIZE * 1000L) / readDurationMs;
 		long bytesWrittenPerSec = (FILE_SIZE * 1000L) / writeDurationMs;
 
 		out.format("%s\twrite=%,d\tread=%,d bytes/sec\n",
 			testCase.getName(), bytesWrittenPerSec, bytesReadPerSec);
+		deleteFile(fileName);
 	    }
 	}
-	deleteFile(FILE_NAME);
+	
     }
 
     private static void preallocateTestFile(final String fileName)
@@ -139,6 +143,57 @@ public final class TestSequentialIoPerf {
 			    2 * PAGE_SIZE, PAGE_SIZE);
 		    buffer.position(PAGE_SIZE / 2);
 		    buffer.limit(PAGE_SIZE / 2 + PAGE_SIZE);
+		    buffer = buffer.slice().order(ByteOrder.nativeOrder());
+		    int checkSum = 0;
+
+		    while (-1 != (channel.read(buffer))) {
+			buffer.flip();
+
+			while (buffer.hasRemaining()) {
+			    checkSum += buffer.get();
+			}
+
+			buffer.clear();
+		    }
+
+		    return checkSum;
+		}
+	    },
+		new PerfTestCase("BufferedChannelFileU1") {
+		public int testWrite(final String fileName) throws Exception {
+		    FileChannel channel = new RandomAccessFile(fileName, "rw")
+			    .getChannel();
+		    ByteBuffer buffer = allocateAlignedByteBuffer(
+			    2 * PAGE_SIZE, PAGE_SIZE);
+		    buffer.position(PAGE_SIZE / 2 + 1);
+		    buffer.limit(PAGE_SIZE / 2 + 1 + PAGE_SIZE);
+		    buffer = buffer.slice().order(ByteOrder.nativeOrder());
+		    int checkSum = 0;
+		    int pos = 0;
+		    for (long i = 0; i < FILE_SIZE; i++) {
+			byte b = (byte) i;
+			checkSum += b;
+			buffer.put(pos++, b);
+
+			if (pos == PAGE_SIZE) {
+			    channel.write(buffer);
+			    buffer.position(0);
+			    pos = 0;
+			}
+		    }
+
+		    channel.close();
+
+		    return checkSum;
+		}
+
+		public int testRead(final String fileName) throws Exception {
+		    FileChannel channel = new RandomAccessFile(fileName, "rw")
+			    .getChannel();
+		    ByteBuffer buffer = allocateAlignedByteBuffer(
+			    2 * PAGE_SIZE, PAGE_SIZE);
+		    buffer.position(PAGE_SIZE / 2 + 1);
+		    buffer.limit(PAGE_SIZE / 2 + 1 + PAGE_SIZE);
 		    buffer = buffer.slice().order(ByteOrder.nativeOrder());
 		    int checkSum = 0;
 

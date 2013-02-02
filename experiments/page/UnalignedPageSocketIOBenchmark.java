@@ -1,4 +1,4 @@
-package alignment;
+package page;
 
 import static util.UnsafeDirectByteBuffer.PAGE_SIZE;
 import static util.UnsafeDirectByteBuffer.allocateAlignedByteBuffer;
@@ -15,7 +15,7 @@ import com.google.caliper.Param;
 import com.google.caliper.Runner;
 import com.google.caliper.SimpleBenchmark;
 
-public class UnalignedPageIOBenchmark extends SimpleBenchmark {
+public class UnalignedPageSocketIOBenchmark extends SimpleBenchmark {
     @Param({ "48", "-16", "0", "-64", "64" })
     int offset;
 
@@ -123,6 +123,6 @@ public class UnalignedPageIOBenchmark extends SimpleBenchmark {
     }
 
     public static void main(String[] args) throws Exception {
-	Runner.main(UnalignedPageIOBenchmark.class, args);
+	Runner.main(UnalignedPageSocketIOBenchmark.class, args);
     }
 }

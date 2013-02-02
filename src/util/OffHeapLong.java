@@ -9,6 +9,7 @@ public final class OffHeapLong implements MemoryLong {
     private final long address = UnsafeDirectByteBuffer.getAddress(buffy);
 
     public OffHeapLong() {
+	this(0L);
     }
 
     public OffHeapLong(final long initialValue) {
