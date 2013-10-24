@@ -44,10 +44,10 @@ public class UnalignedMemoryAccessCostBenchmark extends SimpleBenchmark {
 		final int repeat = 2048 / sizeInPages;
 		for (int i = 0; i < repeat; i++) {
 			for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
-				UnsafeAccess.unsafe.putLong(address, value);
+				UnsafeAccess.UNSAFE.putLong(address, value);
 			}
 			for (address = startingAddress; address < limit; address += CACHE_LINE_SIZE) {
-				if (UnsafeAccess.unsafe.getLong(address) != value)
+				if (UnsafeAccess.UNSAFE.getLong(address) != value)
 					throw new RuntimeException();
 			}
 		}
