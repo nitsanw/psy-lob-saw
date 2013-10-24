@@ -17,27 +17,27 @@ public final class OffHeapLong implements MemoryLong {
 	}
 
 	public long volatileGet() {
-		return UnsafeAccess.unsafe.getLongVolatile(null, address);
+		return UnsafeAccess.UNSAFE.getLongVolatile(null, address);
 	}
 
 	public void directSet(final long value) {
-		UnsafeAccess.unsafe.putLong(address, value);
+		UnsafeAccess.UNSAFE.putLong(address, value);
 	}
 
 	public long directGet() {
-		return UnsafeAccess.unsafe.getLong(address);
+		return UnsafeAccess.UNSAFE.getLong(address);
 	}
 
 	public void lazySet(final long value) {
-		UnsafeAccess.unsafe.putOrderedLong(null, address, value);
+		UnsafeAccess.UNSAFE.putOrderedLong(null, address, value);
 	}
 
 	public void volatileSet(final long value) {
-		UnsafeAccess.unsafe.putLongVolatile(null, address, value);
+		UnsafeAccess.UNSAFE.putLongVolatile(null, address, value);
 	}
 
 	public boolean compareAndSet(final long expectedValue, final long newValue) {
-		return UnsafeAccess.unsafe.compareAndSwapLong(null, address,
+		return UnsafeAccess.UNSAFE.compareAndSwapLong(null, address,
 		        expectedValue, newValue);
 	}
 

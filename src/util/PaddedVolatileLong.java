@@ -5,8 +5,8 @@ public final class PaddedVolatileLong {
 
 	static {
 		try {
-			final int base = UnsafeAccess.unsafe.arrayBaseOffset(long[].class);
-			final int scale = UnsafeAccess.unsafe.arrayIndexScale(long[].class);
+			final int base = UnsafeAccess.UNSAFE.arrayBaseOffset(long[].class);
+			final int scale = UnsafeAccess.UNSAFE.arrayIndexScale(long[].class);
 			valueOffset = base + (scale * 7);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -23,27 +23,27 @@ public final class PaddedVolatileLong {
 	}
 
 	public long get() {
-		return UnsafeAccess.unsafe.getLong(paddedValue, valueOffset);
+		return UnsafeAccess.UNSAFE.getLong(paddedValue, valueOffset);
 	}
 
 	public void set(final long value) {
-		UnsafeAccess.unsafe.putLong(paddedValue, valueOffset, value);
+		UnsafeAccess.UNSAFE.putLong(paddedValue, valueOffset, value);
 	}
 
 	public void setOrdered(final long value) {
-		UnsafeAccess.unsafe.putOrderedLong(paddedValue, valueOffset, value);
+		UnsafeAccess.UNSAFE.putOrderedLong(paddedValue, valueOffset, value);
 	}
 
 	public void setVolatile(final long value) {
-		UnsafeAccess.unsafe.putLongVolatile(paddedValue, valueOffset, value);
+		UnsafeAccess.UNSAFE.putLongVolatile(paddedValue, valueOffset, value);
 	}
 
 	public long getVolatile() {
-		return UnsafeAccess.unsafe.getLongVolatile(paddedValue, valueOffset);
+		return UnsafeAccess.UNSAFE.getLongVolatile(paddedValue, valueOffset);
 	}
 
 	public boolean compareAndSet(final long expectedValue, final long newValue) {
-		return UnsafeAccess.unsafe.compareAndSwapLong(paddedValue, valueOffset,
+		return UnsafeAccess.UNSAFE.compareAndSwapLong(paddedValue, valueOffset,
 		        expectedValue, newValue);
 	}
 

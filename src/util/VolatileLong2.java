@@ -5,7 +5,7 @@ public final class VolatileLong2 implements MemoryLong {
 
 	static {
 		try {
-			valueOffset = UnsafeAccess.unsafe
+			valueOffset = UnsafeAccess.UNSAFE
 			        .objectFieldOffset(VolatileLong2.class
 			                .getDeclaredField("value"));
 		} catch (Exception e) {
@@ -23,7 +23,7 @@ public final class VolatileLong2 implements MemoryLong {
 	}
 
 	public long volatileGet() {
-		return UnsafeAccess.unsafe.getLong(this, valueOffset);
+		return UnsafeAccess.UNSAFE.getLong(this, valueOffset);
 	}
 
 	public long directGet() {
@@ -35,15 +35,15 @@ public final class VolatileLong2 implements MemoryLong {
 	}
 
 	public void lazySet(final long value) {
-		UnsafeAccess.unsafe.putOrderedLong(this, valueOffset, value);
+		UnsafeAccess.UNSAFE.putOrderedLong(this, valueOffset, value);
 	}
 
 	public void volatileSet(final long value) {
-		UnsafeAccess.unsafe.putLongVolatile(this, valueOffset, value);
+		UnsafeAccess.UNSAFE.putLongVolatile(this, valueOffset, value);
 	}
 
 	public boolean compareAndSet(final long expectedValue, final long newValue) {
-		return UnsafeAccess.unsafe.compareAndSwapLong(this, valueOffset,
+		return UnsafeAccess.UNSAFE.compareAndSwapLong(this, valueOffset,
 		        expectedValue, newValue);
 	}
 

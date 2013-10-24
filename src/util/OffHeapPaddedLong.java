@@ -28,23 +28,23 @@ public final class OffHeapPaddedLong {
 	}
 
 	public long getVolatile() {
-		return UnsafeAccess.unsafe.getLongVolatile(null, address);
+		return UnsafeAccess.UNSAFE.getLongVolatile(null, address);
 	}
 
 	public void set(final long value) {
-		UnsafeAccess.unsafe.putLong(address, value);
+		UnsafeAccess.UNSAFE.putLong(address, value);
 	}
 
 	public void setOrdered(final long value) {
-		UnsafeAccess.unsafe.putOrderedLong(null, address, value);
+		UnsafeAccess.UNSAFE.putOrderedLong(null, address, value);
 	}
 
 	public void setVolatile(final long value) {
-		UnsafeAccess.unsafe.putLongVolatile(null, address, value);
+		UnsafeAccess.UNSAFE.putLongVolatile(null, address, value);
 	}
 
 	public boolean isPageAligned() {
-		return (address & (UnsafeAccess.unsafe.pageSize() - 1)) == 0;
+		return (address & (UnsafeAccess.UNSAFE.pageSize() - 1)) == 0;
 	}
 
 	/**

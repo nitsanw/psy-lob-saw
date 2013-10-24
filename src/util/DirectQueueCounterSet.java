@@ -24,35 +24,35 @@ public final class DirectQueueCounterSet {
 	}
 
 	public long getHead() {
-		return UnsafeAccess.unsafe.getLongVolatile(null, headAddress);
+		return UnsafeAccess.UNSAFE.getLongVolatile(null, headAddress);
 	}
 
 	public void setHead(final long value) {
-		UnsafeAccess.unsafe.putLong(headAddress, value);
+		UnsafeAccess.UNSAFE.putLong(headAddress, value);
 	}
 
 	public long getTail() {
-		return UnsafeAccess.unsafe.getLongVolatile(null, tailAddress);
+		return UnsafeAccess.UNSAFE.getLongVolatile(null, tailAddress);
 	}
 
 	public void setTail(final long value) {
-		UnsafeAccess.unsafe.putLong(tailAddress, value);
+		UnsafeAccess.UNSAFE.putLong(tailAddress, value);
 	}
 
 	public long getHeadCache() {
-		return UnsafeAccess.unsafe.getLong(null, headCacheAddress);
+		return UnsafeAccess.UNSAFE.getLong(null, headCacheAddress);
 	}
 
 	public void setHeadCache(final long value) {
-		UnsafeAccess.unsafe.putLong(headCacheAddress, value);
+		UnsafeAccess.UNSAFE.putLong(headCacheAddress, value);
 	}
 
 	public long getTailCache() {
-		return UnsafeAccess.unsafe.getLong(null, tailCacheAddress);
+		return UnsafeAccess.UNSAFE.getLong(null, tailCacheAddress);
 	}
 
 	public void setTailCache(final long value) {
-		UnsafeAccess.unsafe.putLong(tailCacheAddress, value);
+		UnsafeAccess.UNSAFE.putLong(tailCacheAddress, value);
 	}
 
 	public String toString() {
